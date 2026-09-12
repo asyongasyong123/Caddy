@@ -99,13 +99,8 @@
     }
   ],
   "routing": {
-    "domainStrategy": "IPIfNonMatch",
+    "domainStrategy": "AsIs",
     "rules": [
-      {
-        "type": "field",
-        "domain": ["geosite:category-ads-all"],
-        "outboundTag": "blocked"
-      },
       {
         "type": "field",
         "inboundTag": ["trojan-ws", "vless-ws"],
