@@ -30,9 +30,7 @@
         ]
       },
       "sniffing": {
-        "enabled": true,
-        "destOverride": ["http", "tls"],
-        "routeOnly": true
+        "enabled": false
       },
       "streamSettings": {
         "network": "ws",
@@ -62,9 +60,7 @@
         "decryption": "none"
       },
       "sniffing": {
-        "enabled": true,
-        "destOverride": ["http", "tls"],
-        "routeOnly": true
+        "enabled": false
       },
       "streamSettings": {
         "network": "ws",
