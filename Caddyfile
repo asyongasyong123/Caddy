@@ -4,12 +4,11 @@
 }
 
 :8080 {
-    # Health check route
+
     handle /health {
         respond "OK\n" 200
     }
 
-    # Reverse proxy for Trojan WebSocket
     handle /trojan-ws* {
         reverse_proxy 127.0.0.1:10001 {
             header_up Host {host}
@@ -17,7 +16,6 @@
         }
     }
 
-    # Reverse proxy for VLESS WebSocket
     handle /vless-ws* {
         reverse_proxy 127.0.0.1:10002 {
             header_up Host {host}
@@ -25,7 +23,6 @@
         }
     }
 
-    # Decoy site for root path
     handle {
         header Content-Type text/html
         respond `<!DOCTYPE html><html><head><title>System Status</title><style>body{font-family:sans-serif;background:#0d1117;color:#c9d1d9;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;text-align:center;}h1{color:#58a6ff;font-size:24px;}p{color:#8b949e;}</style></head><body><div><h1>Welcome to my Cloud Application Gateway.</h1><p>Everything is operational.</p></div></body></html>` 200
