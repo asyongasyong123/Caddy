@@ -1,0 +1,116 @@
+{
+  "log": {
+    "loglevel": "warning"
+  },
+  "dns": {
+    "servers": ["8.8.8.8", "8.8.4.4"],
+    "strategy": "UseIPv4"
+  },
+  "policy": {
+    "levels": {
+      "0": {
+        "handshake": 2,
+        "connIdle": 3600,
+        "bufferSize": 524288
+      }
+    }
+  },
+  "inbounds": [
+    {
+      "tag": "trojan-ws",
+      "port": 10001,
+      "listen": "127.0.0.1",
+      "protocol": "trojan",
+      "settings": {
+        "clients": [
+          {
+            "password": "gcp-xray",
+            "level": 0
+          }
+        ]
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"],
+        "routeOnly": true
+      },
+      "streamSettings": {
+        "network": "ws",
+        "wsSettings": {
+          "path": "/trojan-ws"
+        },
+        "sockopt": {
+          "tcpNoDelay": true,
+          "tcpFastOpen": true,
+          "tcpKeepAliveIdle": 300,
+          "tcpKeepAliveInterval": 30
+        }
+      }
+    },
+    {
+      "tag": "vless-ws",
+      "port": 10002,
+      "listen": "127.0.0.1",
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "a1b2c3d4-5678-40ef-98ab-cdef01234567",
+            "level": 0
+          }
+        ],
+        "decryption": "none"
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"],
+        "routeOnly": true
+      },
+      "streamSettings": {
+        "network": "ws",
+        "wsSettings": {
+          "path": "/vless-ws"
+        },
+        "sockopt": {
+          "tcpNoDelay": true,
+          "tcpFastOpen": true,
+          "tcpKeepAliveIdle": 300,
+          "tcpKeepAliveInterval": 30
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "tag": "direct",
+      "settings": {
+        "domainStrategy": "UseIPv4"
+      }
+    },
+    {
+      "protocol": "blackhole",
+      "tag": "blocked",
+      "settings": {
+        "response": {
+          "type": "none"
+        }
+      }
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "type": "field",
+        "domain": ["geosite:category-ads-all"],
+        "outboundTag": "blocked"
+      },
+      {
+        "type": "field",
+        "inboundTag": ["trojan-ws", "vless-ws"],
+        "outboundTag": "direct"
+      }
+    ]
+  }
+}
