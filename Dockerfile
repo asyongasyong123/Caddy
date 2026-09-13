@@ -9,20 +9,19 @@ RUN apk add --no-cache ca-certificates
 
 WORKDIR /etc/caddy
 
-# Copy Caddyfile lang
 COPY Caddyfile /etc/caddy/Caddyfile
 
-# Solid JSON config integrated sa build stage
+# Safe Buffer Size (512 KB per connection)
 RUN mkdir -p /etc/xray && echo '{ \
   "log": { "loglevel": "warning" }, \
   "policy": { \
     "levels": { \
       "0": { \
         "handshake": 15, \
-        "connIdle": 600, \
+        "connIdle": 300, \
         "uplinkOnly": 30, \
         "downlinkOnly": 30, \
-        "bufferSize": 4096 \
+        "bufferSize": 512 \
       } \
     } \
   }, \
@@ -35,7 +34,7 @@ RUN mkdir -p /etc/xray && echo '{ \
       "streamSettings": { \
         "network": "ws", \
         "wsSettings": { "path": "/vless-ws", "maxEarlyData": 2048 }, \
-        "sockopt": { "tcpKeepAliveInterval": 15, "mark": 255 } \
+        "sockopt": { "tcpKeepAliveInterval": 15 } \
       } \
     }, \
     { \
@@ -46,7 +45,7 @@ RUN mkdir -p /etc/xray && echo '{ \
       "streamSettings": { \
         "network": "ws", \
         "wsSettings": { "path": "/trojan-ws", "maxEarlyData": 2048 }, \
-        "sockopt": { "tcpKeepAliveInterval": 15, "mark": 255 } \
+        "sockopt": { "tcpKeepAliveInterval": 15 } \
       } \
     } \
   ], \
