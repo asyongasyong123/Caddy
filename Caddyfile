@@ -1,5 +1,4 @@
-{$DOMAIN: :8080} {
-    # VLESS WebSocket Path (Port 10000)
+:8080 {
     @vless_ws {
         header Connection *Upgrade*
         header Upgrade websocket
@@ -9,12 +8,9 @@
         transport http {
             read_timeout 2h
             write_timeout 2h
-            dial_timeout 60s
-            keepalive 300s
         }
     }
 
-    # Trojan WebSocket Path (Port 20000)
     @trojan_ws {
         header Connection *Upgrade*
         header Upgrade websocket
@@ -24,13 +20,8 @@
         transport http {
             read_timeout 2h
             write_timeout 2h
-            dial_timeout 60s
-            keepalive 300s
         }
     }
 
-    # Decoy Response
     respond "Service Running Normal" 200
-
-    encode gzip zstd
 }
