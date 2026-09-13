@@ -4,44 +4,30 @@
 }
 
 :8080 {
+    # Health check route
     handle /health {
-        respond "OK" 200
+        respond "OK\n" 200
     }
 
+    # Reverse proxy for Trojan WebSocket
     handle /trojan-ws* {
         reverse_proxy 127.0.0.1:10001 {
             header_up Host {host}
             header_up X-Real-IP {remote_host}
-            header_up Connection "Upgrade"
-            header_up Upgrade "websocket"
-            flush_interval -1
-            transport http {
-                versions 1.1
-                dial_timeout 15s
-                response_header_timeout 120s
-                keep_alive_idle 7200s
-            }
         }
     }
 
+    # Reverse proxy for VLESS WebSocket
     handle /vless-ws* {
         reverse_proxy 127.0.0.1:10002 {
             header_up Host {host}
             header_up X-Real-IP {remote_host}
-            header_up Connection "Upgrade"
-            header_up Upgrade "websocket"
-            flush_interval -1
-            transport http {
-                versions 1.1
-                dial_timeout 15s
-                response_header_timeout 120s
-                keep_alive_idle 7200s
-            }
         }
     }
 
+    # Decoy site for root path
     handle {
         header Content-Type text/html
-        respond `<!DOCTYPE html><html><body style="background:#0d1117;color:#c9d1d9;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;"><div style="text-align:center;"><h1 style="color:#58a6ff;">System Operational</h1><p style="color:#8b949e;">All services running</p></div></body></html>` 200
+        respond `<!DOCTYPE html><html><head><title>System Status</title><style>body{font-family:sans-serif;background:#0d1117;color:#c9d1d9;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;text-align:center;}h1{color:#58a6ff;font-size:24px;}p{color:#8b949e;}</style></head><body><div><h1>Welcome to my Cloud Application Gateway.</h1><p>Everything is operational.</p></div></body></html>` 200
     }
 }
