@@ -1,6 +1,5 @@
 FROM caddy:2-alpine
 
-# Kinahanglan ang netcat para sa port check!
 RUN apk add --no-cache netcat-openbsd
 
 COPY --from=teddysun/xray:latest /usr/bin/xray /usr/local/bin/
