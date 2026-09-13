@@ -1,33 +1,36 @@
-{
-    admin off
-    http_port 8080
-}
-
-:8080 {
-    # Health check route
-    handle /health {
-        respond "OK\n" 200
+{$DOMAIN: :8080} {
+    # VLESS WebSocket Path (Port 10000)
+    @vless_ws {
+        header Connection *Upgrade*
+        header Upgrade websocket
+        path /vless-ws
     }
-
-    # Reverse proxy for Trojan WebSocket
-    handle /trojan-ws* {
-        reverse_proxy 127.0.0.1:10001 {
-            header_up Host {host}
-            header_up X-Real-IP {remote_host}
+    reverse_proxy @vless_ws 127.0.0.1:10000 {
+        # Gi-extend ang timeouts para sa video streaming / large uploads
+        transport http {
+            read_timeout 1h
+            write_timeout 1h
+            dial_timeout 30s
         }
     }
 
-    # Reverse proxy for VLESS WebSocket
-    handle /vless-ws* {
-        reverse_proxy 127.0.0.1:10002 {
-            header_up Host {host}
-            header_up X-Real-IP {remote_host}
+    # Trojan WebSocket Path (Port 20000)
+    @trojan_ws {
+        header Connection *Upgrade*
+        header Upgrade websocket
+        path /trojan-ws
+    }
+    reverse_proxy @trojan_ws 127.0.0.1:20000 {
+        transport http {
+            read_timeout 1h
+            write_timeout 1h
+            dial_timeout 30s
         }
     }
 
-    # Decoy site for root path
-    handle {
-        header Content-Type text/html
-        respond `<!DOCTYPE html><html><head><title>System Status</title><style>body{font-family:sans-serif;background:#0d1117;color:#c9d1d9;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;text-align:center;}h1{color:#58a6ff;font-size:24px;}p{color:#8b949e;}</style></head><body><div><h1>Welcome to my Cloud Application Gateway.</h1><p>Everything is operational.</p></div></body></html>` 200
-    }
+    # Decoy Response
+    respond "Service Running" 200
+
+    # Compression
+    encode gzip zstd
 }
