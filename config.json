@@ -1,7 +1,5 @@
 {
-  "log": {
-    "loglevel": "warning"
-  },
+  "log": {"loglevel": "warning"},
   "dns": {
     "servers": ["8.8.8.8", "1.1.1.1"],
     "strategy": "UseIPv4"
@@ -22,27 +20,17 @@
       "listen": "127.0.0.1",
       "protocol": "trojan",
       "settings": {
-        "clients": [
-          {
-            "password": "gcp-xray",
-            "level": 0
-          }
-        ]
+        "clients": [{"password": "gcp-xray", "level": 0}]
       },
-      "sniffing": {
-        "enabled": false
-      },
+      "sniffing": {"enabled": false},
       "streamSettings": {
         "network": "ws",
-        "wsSettings": {
-          "path": "/trojan-ws"
-        },
+        "wsSettings": {"path": "/trojan-ws"},
         "sockopt": {
           "tcpNoDelay": true,
           "tcpFastOpen": true,
           "tcpKeepAliveIdle": 300,
-          "tcpKeepAliveInterval": 15,
-          "tcpUserTimeout": 10000
+          "tcpKeepAliveInterval": 15
         }
       }
     },
@@ -52,49 +40,25 @@
       "listen": "127.0.0.1",
       "protocol": "vless",
       "settings": {
-        "clients": [
-          {
-            "id": "a1b2c3d4-5678-40ef-98ab-cdef01234567",
-            "level": 0
-          }
-        ],
+        "clients": [{"id": "a1b2c3d4-5678-40ef-98ab-cdef01234567", "level": 0}],
         "decryption": "none"
       },
-      "sniffing": {
-        "enabled": false
-      },
+      "sniffing": {"enabled": false},
       "streamSettings": {
         "network": "ws",
-        "wsSettings": {
-          "path": "/vless-ws"
-        },
+        "wsSettings": {"path": "/vless-ws"},
         "sockopt": {
           "tcpNoDelay": true,
           "tcpFastOpen": true,
           "tcpKeepAliveIdle": 300,
-          "tcpKeepAliveInterval": 15,
-          "tcpUserTimeout": 10000
+          "tcpKeepAliveInterval": 15
         }
       }
     }
   ],
-  "outbounds": [
-    {
-      "protocol": "freedom",
-      "tag": "direct",
-      "settings": {
-        "domainStrategy": "UseIPv4"
-      }
-    }
-  ],
+  "outbounds": [{"protocol": "freedom", "tag": "direct"}],
   "routing": {
     "domainStrategy": "AsIs",
-    "rules": [
-      {
-        "type": "field",
-        "inboundTag": ["trojan-ws", "vless-ws"],
-        "outboundTag": "direct"
-      }
-    ]
+    "rules": [{"type": "field", "inboundTag": ["trojan-ws", "vless-ws"], "outboundTag": "direct"}]
   }
 }
