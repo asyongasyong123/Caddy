@@ -1,18 +1,34 @@
 {
     admin off
     http_port 8080
+    
+    # Global performance options
+    servers {
+        protocol {
+            strict_sni off
+        }
+        # Maximize connection concurrency
+        max_header_size 1MB
+    }
 }
 
 :8080 {
-    handle /health {
-        respond "OK\n" 200
-    }
-
+    # Optimized Reverse Proxy for Heavy Downloads & HD Streaming
     handle /trojan-ws* {
         reverse_proxy 127.0.0.1:10001 {
             header_up Host {host}
             header_up X-Real-IP {remote_host}
+            header_up Connection "Upgrade"
+            
+            # Disable buffering for maximum speed & real-time throughput
             flush_interval -1
+            
+            # Transport tuning
+            transport http {
+                keepalive 3600s
+                keepalive_idle_conns 1000
+                versions 1.1 2
+            }
         }
     }
 
@@ -20,8 +36,22 @@
         reverse_proxy 127.0.0.1:10002 {
             header_up Host {host}
             header_up X-Real-IP {remote_host}
+            header_up Connection "Upgrade"
+            
+            # Disable buffering for maximum speed & real-time throughput
             flush_interval -1
+            
+            # Transport tuning
+            transport http {
+                keepalive 3600s
+                keepalive_idle_conns 1000
+                versions 1.1 2
+            }
         }
+    }
+
+    handle /health {
+        respond "OK\n" 200
     }
 
     handle {
