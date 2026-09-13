@@ -1,13 +1,11 @@
 #!/bin/sh
 set -e
 
-echo "🚀 Starting Xray core in background..."
-xray run -c /etc/xray.json &
-XRAY_PID=$!
+# Start Xray core in background
+/usr/local/bin/xray run -c /etc/xray.json &
 
-echo "🚀 Starting Caddy server on port 8080..."
-caddy run --config /etc/caddy/Caddyfile --adapter caddyfile &
-CADDY_PID=$!
+# Give Xray time to initialize
+sleep 2
 
-# Wait for both background processes
-wait -n $CADDY_PID $XRAY_PID
+# Start Caddy in foreground
+exec caddy run --config /etc/Caddyfile --adapter caddyfile
