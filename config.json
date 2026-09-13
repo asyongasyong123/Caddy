@@ -1,6 +1,6 @@
 {
   "log": {
-    "loglevel": "error"
+    "loglevel": "warning"
   },
   "dns": {
     "servers": ["8.8.8.8", "1.1.1.1"],
@@ -11,14 +11,8 @@
       "0": {
         "handshake": 4,
         "connIdle": 7200,
-        "downlinkOnly": 0,
-        "uplinkOnly": 0,
-        "bufferSize": 2097152
+        "bufferSize": 4096
       }
-    },
-    "system": {
-      "statsInboundUplink": false,
-      "statsInboundDownlink": false
     }
   },
   "inbounds": [
@@ -41,8 +35,7 @@
       "streamSettings": {
         "network": "ws",
         "wsSettings": {
-          "path": "/trojan-ws",
-          "maxBufferSize": 4194304
+          "path": "/trojan-ws"
         },
         "sockopt": {
           "tcpNoDelay": true,
@@ -73,8 +66,7 @@
       "streamSettings": {
         "network": "ws",
         "wsSettings": {
-          "path": "/vless-ws",
-          "maxBufferSize": 4194304
+          "path": "/vless-ws"
         },
         "sockopt": {
           "tcpNoDelay": true,
@@ -91,14 +83,7 @@
       "protocol": "freedom",
       "tag": "direct",
       "settings": {
-        "domainStrategy": "UseIPv4",
-        "userLevel": 0
-      },
-      "streamSettings": {
-        "sockopt": {
-          "tcpNoDelay": true,
-          "tcpFastOpen": true
-        }
+        "domainStrategy": "UseIPv4"
       }
     }
   ],
