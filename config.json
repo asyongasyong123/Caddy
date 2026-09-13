@@ -1,15 +1,17 @@
 {
-  "log": {"loglevel": "warning"},
+  "log": {
+    "loglevel": "warning"
+  },
   "dns": {
-    "servers": ["8.8.8.8", "1.1.1.1"],
+    "servers": ["8.8.8.8", "8.8.4.4"],
     "strategy": "UseIPv4"
   },
   "policy": {
     "levels": {
       "0": {
-        "handshake": 4,
-        "connIdle": 7200,
-        "bufferSize": 4096
+        "handshake": 2,
+        "connIdle": 3600,
+        "bufferSize": 524288
       }
     }
   },
@@ -20,17 +22,28 @@
       "listen": "127.0.0.1",
       "protocol": "trojan",
       "settings": {
-        "clients": [{"password": "gcp-xray", "level": 0}]
+        "clients": [
+          {
+            "password": "gcp-xray",
+            "level": 0
+          }
+        ]
       },
-      "sniffing": {"enabled": false},
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"],
+        "routeOnly": true
+      },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": {"path": "/trojan-ws"},
+        "wsSettings": {
+          "path": "/trojan-ws"
+        },
         "sockopt": {
           "tcpNoDelay": true,
           "tcpFastOpen": true,
           "tcpKeepAliveIdle": 300,
-          "tcpKeepAliveInterval": 15
+          "tcpKeepAliveInterval": 30
         }
       }
     },
@@ -40,25 +53,64 @@
       "listen": "127.0.0.1",
       "protocol": "vless",
       "settings": {
-        "clients": [{"id": "a1b2c3d4-5678-40ef-98ab-cdef01234567", "level": 0}],
+        "clients": [
+          {
+            "id": "a1b2c3d4-5678-40ef-98ab-cdef01234567",
+            "level": 0
+          }
+        ],
         "decryption": "none"
       },
-      "sniffing": {"enabled": false},
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"],
+        "routeOnly": true
+      },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": {"path": "/vless-ws"},
+        "wsSettings": {
+          "path": "/vless-ws"
+        },
         "sockopt": {
           "tcpNoDelay": true,
           "tcpFastOpen": true,
           "tcpKeepAliveIdle": 300,
-          "tcpKeepAliveInterval": 15
+          "tcpKeepAliveInterval": 30
         }
       }
     }
   ],
-  "outbounds": [{"protocol": "freedom", "tag": "direct"}],
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "tag": "direct",
+      "settings": {
+        "domainStrategy": "UseIPv4"
+      }
+    },
+    {
+      "protocol": "blackhole",
+      "tag": "blocked",
+      "settings": {
+        "response": {
+          "type": "none"
+        }
+      }
+    }
+  ],
   "routing": {
-    "domainStrategy": "AsIs",
-    "rules": [{"type": "field", "inboundTag": ["trojan-ws", "vless-ws"], "outboundTag": "direct"}]
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "type": "field",
+        "domain": ["geosite:category-ads-all"],
+        "outboundTag": "blocked"
+      },
+      {
+        "type": "field",
+        "inboundTag": ["trojan-ws", "vless-ws"],
+        "outboundTag": "direct"
+      }
+    ]
   }
 }
