@@ -1,16 +1,14 @@
 {
     admin off
     http_port 8080
-    keepalive 60s
 }
 
 :8080 {
-    # ✅ KINI ANG MAO ANG SULATON SA CLOUD RUN HEALTH CHECK
     handle /health {
         respond "OK" 200
     }
 
-    handle_path /trojan-ws {
+    handle /trojan-ws* {
         reverse_proxy 127.0.0.1:10001 {
             header_up Host {host}
             header_up X-Real-IP {remote_host}
@@ -26,7 +24,7 @@
         }
     }
 
-    handle_path /vless-ws {
+    handle /vless-ws* {
         reverse_proxy 127.0.0.1:10002 {
             header_up Host {host}
             header_up X-Real-IP {remote_host}
@@ -42,7 +40,8 @@
         }
     }
 
-    handle /* {
+    handle {
+        header Content-Type text/html
         respond `<!DOCTYPE html><html><body style="background:#0d1117;color:#c9d1d9;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;"><div style="text-align:center;"><h1 style="color:#58a6ff;">System Operational</h1><p style="color:#8b949e;">All services running</p></div></body></html>` 200
     }
 }
