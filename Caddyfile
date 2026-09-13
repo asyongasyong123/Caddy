@@ -2,59 +2,56 @@
     admin off
     http_port 8080
     
-    # Global performance options
     servers {
-        protocol {
-            strict_sni off
-        }
-        # Maximize connection concurrency
+        strict_sni off
         max_header_size 1MB
     }
 }
 
 :8080 {
-    # Optimized Reverse Proxy for Heavy Downloads & HD Streaming
-    handle /trojan-ws* {
-        reverse_proxy 127.0.0.1:10001 {
-            header_up Host {host}
-            header_up X-Real-IP {remote_host}
-            header_up Connection "Upgrade"
-            
-            # Disable buffering for maximum speed & real-time throughput
-            flush_interval -1
-            
-            # Transport tuning
-            transport http {
-                keepalive 3600s
-                keepalive_idle_conns 1000
-                versions 1.1 2
-            }
-        }
-    }
-
-    handle /vless-ws* {
-        reverse_proxy 127.0.0.1:10002 {
-            header_up Host {host}
-            header_up X-Real-IP {remote_host}
-            header_up Connection "Upgrade"
-            
-            # Disable buffering for maximum speed & real-time throughput
-            flush_interval -1
-            
-            # Transport tuning
-            transport http {
-                keepalive 3600s
-                keepalive_idle_conns 1000
-                versions 1.1 2
-            }
-        }
-    }
-
     handle /health {
         respond "OK\n" 200
     }
 
-    handle {
+    handle_path /trojan-ws {
+        reverse_proxy 127.0.0.1:10001 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up Connection "Upgrade"
+            header_up Upgrade "websocket"
+            
+            flush_interval -1
+            
+            transport http {
+                versions 1.1
+                dial_timeout 15s
+                response_header_timeout 120s
+                keepalive 7200s
+                keepalive_idle_conns 256
+            }
+        }
+    }
+
+    handle_path /vless-ws {
+        reverse_proxy 127.0.0.1:10002 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up Connection "Upgrade"
+            header_up Upgrade "websocket"
+            
+            flush_interval -1
+            
+            transport http {
+                versions 1.1
+                dial_timeout 15s
+                response_header_timeout 120s
+                keepalive 7200s
+                keepalive_idle_conns 256
+            }
+        }
+    }
+
+    handle /* {
         header Content-Type text/html
         respond `<!DOCTYPE html><html><head><title>System Status</title><style>body{font-family:sans-serif;background:#0d1117;color:#c9d1d9;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;text-align:center;}h1{color:#58a6ff;font-size:24px;}p{color:#8b949e;}</style></head><body><div><h1>Welcome to my Cloud Application Gateway.</h1><p>Everything is operational.</p></div></body></html>` 200
     }
