@@ -4,7 +4,6 @@
 }
 
 :8080 {
-
     handle /health {
         respond "OK\n" 200
     }
@@ -13,6 +12,7 @@
         reverse_proxy 127.0.0.1:10001 {
             header_up Host {host}
             header_up X-Real-IP {remote_host}
+            flush_interval -1
         }
     }
 
@@ -20,6 +20,7 @@
         reverse_proxy 127.0.0.1:10002 {
             header_up Host {host}
             header_up X-Real-IP {remote_host}
+            flush_interval -1
         }
     }
 
