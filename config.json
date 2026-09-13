@@ -1,18 +1,24 @@
 {
   "log": {
-    "loglevel": "warning"
+    "loglevel": "error"
   },
   "dns": {
-    "servers": ["8.8.8.8", "8.8.4.4"],
+    "servers": ["8.8.8.8", "1.1.1.1"],
     "strategy": "UseIPv4"
   },
   "policy": {
     "levels": {
       "0": {
-        "handshake": 2,
-        "connIdle": 3600,
-        "bufferSize": 524288
+        "handshake": 4,
+        "connIdle": 7200,
+        "downlinkOnly": 0,
+        "uplinkOnly": 0,
+        "bufferSize": 2097152
       }
+    },
+    "system": {
+      "statsInboundUplink": false,
+      "statsInboundDownlink": false
     }
   },
   "inbounds": [
@@ -35,13 +41,15 @@
       "streamSettings": {
         "network": "ws",
         "wsSettings": {
-          "path": "/trojan-ws"
+          "path": "/trojan-ws",
+          "maxBufferSize": 4194304
         },
         "sockopt": {
           "tcpNoDelay": true,
           "tcpFastOpen": true,
           "tcpKeepAliveIdle": 300,
-          "tcpKeepAliveInterval": 30
+          "tcpKeepAliveInterval": 15,
+          "tcpUserTimeout": 10000
         }
       }
     },
@@ -65,13 +73,15 @@
       "streamSettings": {
         "network": "ws",
         "wsSettings": {
-          "path": "/vless-ws"
+          "path": "/vless-ws",
+          "maxBufferSize": 4194304
         },
         "sockopt": {
           "tcpNoDelay": true,
           "tcpFastOpen": true,
           "tcpKeepAliveIdle": 300,
-          "tcpKeepAliveInterval": 30
+          "tcpKeepAliveInterval": 15,
+          "tcpUserTimeout": 10000
         }
       }
     }
@@ -81,15 +91,13 @@
       "protocol": "freedom",
       "tag": "direct",
       "settings": {
-        "domainStrategy": "UseIPv4"
-      }
-    },
-    {
-      "protocol": "blackhole",
-      "tag": "blocked",
-      "settings": {
-        "response": {
-          "type": "none"
+        "domainStrategy": "UseIPv4",
+        "userLevel": 0
+      },
+      "streamSettings": {
+        "sockopt": {
+          "tcpNoDelay": true,
+          "tcpFastOpen": true
         }
       }
     }
