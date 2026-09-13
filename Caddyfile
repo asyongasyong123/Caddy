@@ -6,11 +6,11 @@
         path /vless-ws
     }
     reverse_proxy @vless_ws 127.0.0.1:10000 {
-        # Gi-extend ang timeouts para sa video streaming / large uploads
         transport http {
-            read_timeout 1h
-            write_timeout 1h
-            dial_timeout 30s
+            read_timeout 2h
+            write_timeout 2h
+            dial_timeout 60s
+            keepalive 300s
         }
     }
 
@@ -22,15 +22,15 @@
     }
     reverse_proxy @trojan_ws 127.0.0.1:20000 {
         transport http {
-            read_timeout 1h
-            write_timeout 1h
-            dial_timeout 30s
+            read_timeout 2h
+            write_timeout 2h
+            dial_timeout 60s
+            keepalive 300s
         }
     }
 
     # Decoy Response
-    respond "Service Running" 200
+    respond "Service Running Normal" 200
 
-    # Compression
     encode gzip zstd
 }
