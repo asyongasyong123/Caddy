@@ -1,27 +1,44 @@
+{
+  servers {
+    protocols h1 h2
+    keepalive_interval 15s
+  }
+}
+
 :8080 {
-    @vless_ws {
-        header Connection *Upgrade*
-        header Upgrade websocket
-        path /vless-ws
+  @vless_ws {
+    header Connection *Upgrade*
+    header Upgrade websocket
+    path /vless-ws
+  }
+  reverse_proxy @vless_ws 127.0.0.1:10000 {
+    header_up Connection Upgrade
+    header_up Upgrade websocket
+    transport http {
+      dial_timeout 5s
+      keepalive 120s
+      keepalive_interval 15s
+      read_timeout 2h
+      write_timeout 2h
     }
-    reverse_proxy @vless_ws 127.0.0.1:10000 {
-        transport http {
-            read_timeout 2h
-            write_timeout 2h
-        }
-    }
+  }
 
-    @trojan_ws {
-        header Connection *Upgrade*
-        header Upgrade websocket
-        path /trojan-ws
+  @trojan_ws {
+    header Connection *Upgrade*
+    header Upgrade websocket
+    path /trojan-ws
+  }
+  reverse_proxy @trojan_ws 127.0.0.1:20000 {
+    header_up Connection Upgrade
+    header_up Upgrade websocket
+    transport http {
+      dial_timeout 5s
+      keepalive 120s
+      keepalive_interval 15s
+      read_timeout 2h
+      write_timeout 2h
     }
-    reverse_proxy @trojan_ws 127.0.0.1:20000 {
-        transport http {
-            read_timeout 2h
-            write_timeout 2h
-        }
-    }
+  }
 
-    respond "Service Running Normal" 200
+  respond "Service Running Normal" 200
 }
