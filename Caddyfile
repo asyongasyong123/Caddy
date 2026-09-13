@@ -1,4 +1,5 @@
 {
+  auto_https off
   servers {
     protocols h1 h2
     keepalive_interval 15s
@@ -7,15 +8,16 @@
 
 :8080 {
   @vless_ws {
-    header Connection *Upgrade*
-    header Upgrade websocket
     path /vless-ws
+    header Connection *upgrade*
+    header Upgrade websocket
   }
   reverse_proxy @vless_ws 127.0.0.1:10000 {
     header_up Connection Upgrade
     header_up Upgrade websocket
+    header_up -Origin
     transport http {
-      dial_timeout 5s
+      dial_timeout 10s
       keepalive 120s
       keepalive_interval 15s
       read_timeout 2h
@@ -24,15 +26,16 @@
   }
 
   @trojan_ws {
-    header Connection *Upgrade*
-    header Upgrade websocket
     path /trojan-ws
+    header Connection *upgrade*
+    header Upgrade websocket
   }
   reverse_proxy @trojan_ws 127.0.0.1:20000 {
     header_up Connection Upgrade
     header_up Upgrade websocket
+    header_up -Origin
     transport http {
-      dial_timeout 5s
+      dial_timeout 10s
       keepalive 120s
       keepalive_interval 15s
       read_timeout 2h
