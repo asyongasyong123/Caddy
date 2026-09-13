@@ -19,7 +19,7 @@
                 versions 1.1
                 dial_timeout 15s
                 response_header_timeout 120s
-                keepalive 7200s
+                keep_alive_idle 7200s
             }
         }
     }
@@ -35,7 +35,7 @@
                 versions 1.1
                 dial_timeout 15s
                 response_header_timeout 120s
-                keepalive 7200s
+                keep_alive_idle 7200s
             }
         }
     }
